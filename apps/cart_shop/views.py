@@ -16,16 +16,17 @@ def save_product_in_wishlist(request, product_id):
 
 class WishlistView(View):
     def get(self, request):
-        wishlist_items = WishlistItem.objects.filter(wishlist__user=request.user)
-        data = list(wishlist_items)
-        total_price = sum(item.product.price * item.quantity
-                                      for item in data)
+        if request.user.is_authenticated:
+            wishlist_items = WishlistItem.objects.filter(wishlist__user=request.user)
+            data = list(wishlist_items)
+            total_price = sum(item.product.price * item.quantity
+                                          for item in data)
 
-        context = {'wishlist_items': data,
-                   'total_price': total_price,
-                   }
-        return render(request, 'cart_shop/wishlist.html', context)
-
+            context = {'wishlist_items': data,
+                       'total_price': total_price,
+                       }
+            return render(request, 'cart_shop/wishlist.html', context)
+        return redirect('auth_shop:login')
 
 class WishlistAdd(View):
     def get(self, request, product_id):
